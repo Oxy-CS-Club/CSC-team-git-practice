@@ -1,0 +1,41 @@
+name: Checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  conflict-markers:
+    name: conflict-markers
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Look for leftover merge conflict markers
+        run: |
+          # docs/ is skipped because the SOP shows example markers on purpose.
+          if git grep -nE '^(<<<<<<<|>>>>>>>)( |$)|^=======$' -- . ':!docs/'; then
+            echo ""
+            echo "::error::Found merge conflict markers (listed above as file:line)."
+            echo "Open each file, keep the content you want, and delete every <<<<<<<, ======= and >>>>>>> line."
+            exit 1
+          fi
+          echo "No conflict markers found."
+
+  member-files:
+    name: member-files
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check member profile file names
+        run: |
+          bad=$(git ls-files members/ | grep -vE '^members/([a-z0-9-]+\.md|\.gitkeep)$' || true)
+          if [ -n "$bad" ]; then
+            echo "$bad"
+            echo ""
+            echo "::error::These files in members/ have invalid names (listed above)."
+            echo "Profiles must be members/<firstname>.md: lowercase letters, numbers or '-' only, e.g. members/amy.md or members/amy-c.md"
+            exit 1
+          fi
+          echo "All member files are named correctly."
