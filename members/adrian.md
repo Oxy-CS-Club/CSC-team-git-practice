@@ -1,0 +1,4 @@
+- **Github:** @adralv
+- **Year/Major:** Freshman/Undeclared (CS intended)
+- **One thing I want to learn in this project:** How to work on a Github project with a team.
+- **Fun fact:** I can play the Accordion.
